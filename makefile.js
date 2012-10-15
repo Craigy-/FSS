@@ -2,7 +2,7 @@
  * FSS release's builder (v1.0.0)
  * Copy this script to 'scripts' in editor's main folder. Then just open any source file of FSS and execute script.
  *
- * @requires YUI Compressor v2.4.7 or newer
+ * @requires YUI Compressor v2.4.7 or newer (compressor.jar)
  *
  * Script by Grigory Zarubin (http://craigy.ru) for GridinSoft Notepad Pro (http://notepad.gridinsoft.com)
  */
