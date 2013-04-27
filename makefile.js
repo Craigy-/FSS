@@ -7,7 +7,7 @@
  * Script by Grigory Zarubin (http://craigy.ru) for GridinSoft Notepad Pro (http://notepad.gridinsoft.com)
  */
 
-// РћРїСЂРµРґРµР»СЏРµРј РІСЃРµ РїСѓС‚Рё
+// Определяем все пути
 var PATH = Shell.GetCurrentFolder();
 
 var pathArr = PATH.split('\\');
@@ -37,24 +37,24 @@ var FSS_DATA = SRC_PATH + 'input_data.js';
 var FOOTER = SRC_PATH + 'htmlfoot.htm';
 
 
-// Р’С‹Р±РёСЂР°РµРј СЂРµР¶РёРј СЃР±РѕСЂРєРё, РґР»СЏ СѓРґРѕР±СЃС‚РІР° Р°РІС‚РѕРјР°С‚РѕРј РїРѕРґСЃС‚Р°РІР»СЏРµРј РІРµСЂСЃРёСЋ (РїРѕ СЃРїРµС†РёС„РёРєР°С†РёРё Semantic Versioning Specification) Рё Р·Р°РїСѓСЃРєР°РµРј СЃР±РѕСЂРєСѓ
+// Выбираем режим сборки, для удобства автоматом подставляем версию (по спецификации Semantic Versioning Specification) и запускаем сборку
 var dlg = Application.Dialog;
 var currentVersionArr = Shell.FileTostring(VERSION).split('.');
 var newVersion = currentVersionArr[0] + '.' + currentVersionArr[1] + '.' + (parseInt(currentVersionArr[2], 10) + 1);
 
 dlg.ClearItems();
-dlg.AddItem('VERSION_LABEL','10;20;label;Р’РµСЂСЃРёСЏ СЂРµР»РёР·Р°;no use');
+dlg.AddItem('VERSION_LABEL','10;20;label;Версия релиза;no use');
 dlg.AddItem('VERSION_VALUE','10;35;edit;'+newVersion+';200');
-dlg.AddItem('BUILD_MODE_LABEL','10;65;label;Р РµР¶РёРј СЃР±РѕСЂРєРё;no use');
-dlg.AddItem('BUILD_MODE_VALUE','10;80;combobox;РЎР¶Р°С‚СЊ Рё РѕР±С„СѓСЃС†РёСЂРѕРІР°С‚СЊ|РќРµ СЃР¶РёРјР°С‚СЊ;200');
+dlg.AddItem('BUILD_MODE_LABEL','10;65;label;Режим сборки;no use');
+dlg.AddItem('BUILD_MODE_VALUE','10;80;combobox;Сжать и обфусцировать|Не сжимать;200');
 
-if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Р’С‹Р±РµСЂРёС‚Рµ РїР°СЂР°РјРµС‚СЂС‹ РїРµСЂРµРґ РЅР°С‡Р°Р»РѕРј:', 300, 200)) {
+if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Выберите параметры перед началом:', 300, 200)) {
   var result = dlg.Result;
   newVersion = result.Item('VERSION_VALUE');
-  var packed = result.Item('BUILD_MODE_VALUE')=='РЎР¶Р°С‚СЊ Рё РѕР±С„СѓСЃС†РёСЂРѕРІР°С‚СЊ';
+  var packed = result.Item('BUILD_MODE_VALUE')=='Сжать и обфусцировать';
   var RELEASE = ROOT_PATH + '\\release\\fss' + (packed ? '.htm' : '_full.htm');
 
-  // РЎРѕР±РёСЂР°РµРј СЂРµР»РёР·
+  // Собираем релиз
   var all = '';
   var file_content = '';
   var temp = '';
@@ -149,4 +149,4 @@ if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Р’С‹Р±РµСЂРёС‚Рµ РїР°СЂР°РјРµС‚С
   Shell.CreateFile(RELEASE, all);
 }
 
-Application.Message('', 'Р РµР»РёР· СЃРѕР±СЂР°РЅ РІ С„Р°Р№Р» '+RELEASE, 0);
+Application.Message('', 'Релиз собран в файл '+RELEASE, 0);
