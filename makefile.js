@@ -1,5 +1,5 @@
 /*!
- * FSS release's builder (v1.0.0)
+ * FSS release's builder (v1.0.1)
  * Copy this script to 'scripts' in editor's main folder. Then just open any source file of FSS and execute script.
  *
  * @requires YUI Compressor v2.4.7 or newer (compressor.jar)
@@ -17,7 +17,7 @@ var COMPRESSOR = ROOT_PATH + '\\compressor.jar';
 var VERSION = ROOT_PATH + '\\version.fss';
 
 var SRC_PATH = PATH + '\\';
-var HEADER = SRC_PATH + 'htmlhead.htm';
+var HEADER = SRC_PATH + 'header.htm';
 var JS_LIBRARY = SRC_PATH + 'include\\suilib_lite.js';
 var JS_LIBRARY_MIN = SRC_PATH + 'include\\suilib_lite.min.js';
 var STYLES_MAIN = SRC_PATH + 'css\\styles.css';
@@ -34,25 +34,33 @@ var FSS_CODE_TABS_MIN = SRC_PATH + 'include\\tabs.min.js';
 var FSS_CODE_OBJ = SRC_PATH + 'include\\obj.js';
 var FSS_CODE_OBJ_MIN = SRC_PATH + 'include\\obj.min.js';
 var FSS_DATA = SRC_PATH + 'input_data.js';
-var FOOTER = SRC_PATH + 'htmlfoot.htm';
+var FOOTER = SRC_PATH + 'footer.htm';
 
 
 // Выбираем режим сборки, для удобства автоматом подставляем версию (по спецификации Semantic Versioning Specification) и запускаем сборку
 var dlg = Application.Dialog;
-var currentVersionArr = Shell.FileTostring(VERSION).split('.');
+var currentVersion = Shell.FileTostring(VERSION);
+var currentVersionArr = currentVersion.split('.');
 var newVersion = currentVersionArr[0] + '.' + currentVersionArr[1] + '.' + (parseInt(currentVersionArr[2], 10) + 1);
 
 dlg.ClearItems();
-dlg.AddItem('VERSION_LABEL','10;20;label;Версия релиза;no use');
-dlg.AddItem('VERSION_VALUE','10;35;edit;'+newVersion+';200');
-dlg.AddItem('BUILD_MODE_LABEL','10;65;label;Режим сборки;no use');
-dlg.AddItem('BUILD_MODE_VALUE','10;80;combobox;Сжать и обфусцировать|Не сжимать;200');
+dlg.AddItem('VERSION_LABEL','10;5;label;Версия релиза:;no use');
+dlg.AddItem('VERSION_VALUE','10;20;edit;'+newVersion+';200');
+dlg.AddItem('VERSION_USE','10;45;checkbox;Не учитывать;false');
+dlg.AddItem('BUILD_MODE_LABEL','10;70;label;При сборке:;no use');
+dlg.AddItem('BUILD_MODE_VALUE','10;85;combobox;Сжимать и обфусцировать|Не сжимать;200');
 
-if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Выберите параметры перед началом:', 300, 200)) {
+if(dlg.Show('FSS release\'s builder (v1.0.1)', 'Выберите параметры перед началом:', 300, 195)) {
   var result = dlg.Result;
-  newVersion = result.Item('VERSION_VALUE');
+  var version_use = result.Item('VERSION_USE')=='False';
   var packed = result.Item('BUILD_MODE_VALUE')=='Сжать и обфусцировать';
   var RELEASE = ROOT_PATH + '\\release\\fss' + (packed ? '.htm' : '_full.htm');
+
+  if(version_use) {
+    newVersion = result.Item('VERSION_VALUE');
+  } else {
+    newVersion = currentVersion;
+  }
 
   // Собираем релиз
   var all = '';
@@ -65,19 +73,6 @@ if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Выберите параметры перед началом
   all += temp_;
   if(packed) {
     Console.SetVisible(true);
-    Console.Execute('java -jar "'+COMPRESSOR+'" --type js --charset utf-8  --verbose -o "'+JS_LIBRARY_MIN+'" "'+JS_LIBRARY+'"');
-    Console.SetVisible(false);
-    if(Shell.FileExist(JS_LIBRARY_MIN)) {
-      file_content = Shell.FileTostring(JS_LIBRARY_MIN);
-      Shell.DeleteFile(JS_LIBRARY_MIN);
-    }
-  }
-  if(file_content=='') file_content = Shell.FileTostring(JS_LIBRARY);
-  temp = '\n<script type="text\/javascript">\n\/\/<![CDATA[\n' + file_content + '\n\/\/]]>\n<\/script>\n';
-  file_content = '';
-  all += temp;
-  if(packed) {
-    Console.SetVisible(true);
     Console.Execute('java -jar "'+COMPRESSOR+'" --type css --charset utf-8  --verbose -o "'+STYLES_MAIN_MIN+'" "'+STYLES_MAIN+'"');
     Console.SetVisible(false);
     if(Shell.FileExist(STYLES_MAIN_MIN)) {
@@ -86,7 +81,7 @@ if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Выберите параметры перед началом
     }
   }
   if(file_content=='') file_content = Shell.FileTostring(STYLES_MAIN);
-  temp = '<style type="text\/css" media="screen, projection">\n' + file_content + '\n<\/style>\n';
+  temp = '\r\n<style type="text\/css" media="screen, projection">\r\n' + file_content + '\r\n<\/style>';
   file_content = '';
   all += temp;
   if(packed) {
@@ -99,7 +94,7 @@ if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Выберите параметры перед началом
     }
   }
   if(file_content=='') file_content = Shell.FileTostring(STYLES_IE);
-  temp = '<!--[if lte IE 7]><style type="text\/css" media="screen, projection">\n' + file_content + '\n<\/style><![endif]-->\n';
+  temp = '\r\n<!--[if lte IE 7]><style type="text\/css" media="screen, projection">\r\n' + file_content + '\r\n<\/style><![endif]-->';
   file_content = '';
   all += temp;
   if(packed) {
@@ -112,7 +107,20 @@ if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Выберите параметры перед началом
     }
   }
   if(file_content=='') file_content = Shell.FileTostring(STYLES_PRINT);
-  temp = '<style type="text\/css" media="print">\n' + file_content + '\n<\/style>\n';
+  temp = '\r\n<style type="text\/css" media="print">\r\n' + file_content + '\r\n<\/style>\r\n';
+  file_content = '';
+  all += temp;
+  if(packed) {
+    Console.SetVisible(true);
+    Console.Execute('java -jar "'+COMPRESSOR+'" --type js --charset utf-8  --verbose -o "'+JS_LIBRARY_MIN+'" "'+JS_LIBRARY+'"');
+    Console.SetVisible(false);
+    if(Shell.FileExist(JS_LIBRARY_MIN)) {
+      file_content = Shell.FileTostring(JS_LIBRARY_MIN);
+      Shell.DeleteFile(JS_LIBRARY_MIN);
+    }
+  }
+  if(file_content=='') file_content = Shell.FileTostring(JS_LIBRARY);
+  temp = '<script type="text\/javascript">\r\n\/\/<![CDATA[\r\n' + file_content + '\r\n\/\/]]>\r\n<\/script>\r\n';
   file_content = '';
   all += temp;
   temp = Shell.FileTostring(FSS_HTML);
@@ -137,16 +145,19 @@ if(dlg.Show('FSS release\'s builder (v1.0.0)', 'Выберите параметры перед началом
       Shell.DeleteFile(FSS_CODE_MIN);
     }
   }
-  if(file_content=='') file_content = Shell.FileTostring(FSS_CODE_TABS) + '\n\r\n' + Shell.FileTostring(FSS_CODE_OBJ) + '\n\r\n' + Shell.FileTostring(FSS_CODE);
-  temp = '\n\r\n<script type="text\/javascript">\n\/\/<![CDATA[\n' + file_content + '\n\r\n' + Shell.FileTostring(FSS_DATA) + '\n\/\/]]>\n<\/script>\n';
+  if(file_content=='') file_content = Shell.FileTostring(FSS_CODE_TABS) + '\r\n\r\n' + Shell.FileTostring(FSS_CODE_OBJ) + '\r\n\r\n\r\n' + Shell.FileTostring(FSS_CODE);
+  temp = '\r\n\r\n<script type="text\/javascript">\r\n\/\/<![CDATA[\r\n' + file_content + '\r\n\r\n\r\n' + Shell.FileTostring(FSS_DATA) + '\r\n\/\/]]>\r\n<\/script>\r\n';
   all += temp;
   temp = Shell.FileTostring(FOOTER);
   all += temp;
 
-  if(Shell.FileExist(VERSION)) Shell.DeleteFile(VERSION);
-  if(Shell.FileExist(RELEASE)) Shell.DeleteFile(RELEASE);
-  Shell.CreateFile(VERSION, newVersion);
-  Shell.CreateFile(RELEASE, all);
-}
+  
+  if(version_use) {
+    if(Shell.FileExist(VERSION)) Shell.DeleteFile(VERSION);
+    Shell.CreateFile(VERSION, newVersion);
+  }
 
-Application.Message('', 'Релиз собран в файл '+RELEASE, 0);
+  if(Shell.FileExist(RELEASE)) Shell.DeleteFile(RELEASE);
+  Shell.CreateFile(RELEASE, all);
+  Application.Message('FSS release\'s builder (v1.0.1)', 'Релиз собран в файл '+RELEASE, 0);
+}
