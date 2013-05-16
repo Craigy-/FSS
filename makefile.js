@@ -2,7 +2,7 @@
  * FSS release's builder (v1.0.1)
  * Copy this script to 'scripts' in editor's main folder. Then just open any source file of FSS and execute script.
  *
- * @requires YUI Compressor v2.4.7 or newer (compressor.jar)
+ * @requires YUI Compressor v2.4.7 or newer ('compressor.jar' must be in root folder of this repository)
  *
  * Script by Grigory Zarubin (http://craigy.ru) for GridinSoft Notepad Pro (http://notepad.gridinsoft.com)
  */
@@ -31,8 +31,8 @@ var FSS_CODE = SRC_PATH + 'fss.js';
 var FSS_CODE_MIN = SRC_PATH + 'fss.min.js';
 var FSS_CODE_TABS = SRC_PATH + 'include\\tabs.js';
 var FSS_CODE_TABS_MIN = SRC_PATH + 'include\\tabs.min.js';
-var FSS_CODE_OBJ = SRC_PATH + 'include\\obj.js';
-var FSS_CODE_OBJ_MIN = SRC_PATH + 'include\\obj.min.js';
+var FSS_CODE_OBJ = SRC_PATH + 'include\\objTools.js';
+var FSS_CODE_OBJ_MIN = SRC_PATH + 'include\\objTools.min.js';
 var FSS_DATA = SRC_PATH + 'input_data.js';
 var FOOTER = SRC_PATH + 'footer.htm';
 
