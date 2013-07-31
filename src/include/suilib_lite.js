@@ -1,7 +1,7 @@
 /*!
  * Яваскриптовый фреймворк
  * Версия: 1.0.24 Final (03.11.2009)
- * Авторы: Иван Азарёнок (azaryonok@mail.ru), Григорий Зарубин (grinder@tsu.tula.ru), Андрей Сидоров (takandar@gmail.com)
+ * Авторы: Иван Азарёнок (azaryonok@mail.ru), Григорий Зарубин (admin@craigy.ru), Андрей Сидоров (takandar@gmail.com)
  */
 
 var suilib = {
